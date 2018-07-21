@@ -1,6 +1,8 @@
 import socket
 import json
 import sys
+import struct
+import socket_util as su
 
 PORT_NUM = 5555
 
@@ -20,11 +22,15 @@ class Server(object):
         self.sock.bind((self.host, self.port))
 
     def listen(self):
-        self.sock.listen(socket.SOMAXCONN)
-        while True:
+        try:
+            self.sock.listen(socket.SOMAXCONN)
             client, address = self.sock.accept()
             print 'recived connection from:',address
             self.consoleWithClient(client, address)
+        except KeyboardInterrupt:
+            raise
+        except:
+            self.listen()
     
     def consoleWithClient(self, client, address):
         command = 'initial'
@@ -48,7 +54,8 @@ class Server(object):
                 print 'sendfile'
 
     def excuteRemoteCommand(self,client, address, command):
-        print 'excutecommand'
-
+        su.sendAll(client, command)
+        print su.recvAll(client)
+    
 if __name__ == "__main__":
     Server('',PORT_NUM).listen()
