@@ -30,4 +30,5 @@ class Server(object):
             command = raw_input('reverse_shell:{}>'.format(address))
 
 if __name__ == "__main__":
+    print 'hello'
     Server('',PORT_NUM).listen()
