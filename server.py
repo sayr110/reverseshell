@@ -3,6 +3,7 @@ import json
 import sys
 import struct
 import socket_util as su
+import file_util as fu
 
 PORT_NUM = 5555
 
@@ -39,21 +40,48 @@ class Server(object):
             
             if 'help' in command:
                 print json.dumps(COMMANDS, indent=4)
+                continue
 
             if 'exit' in command:
-                print 'exit server'
                 sys.exit()
 
             if 'cmd' in command:
                 self.excuteRemoteCommand(client, address, command)
+                continue
             
-            if 'getfile' in command:
-                print 'getfile'
+            splited_cmd = command.split(' ')
+            if len(splited_cmd) < 3:
+                print 'command is worng {}'.format(command)
+                continue
             
             if 'sendfile' in command:
-                print 'sendfile'
+                data = fu.getFileData(splited_cmd[1])
+                if data == None:
+                    print 'failed to get data from file'
+                    continue
+                
+                su.sendAll(client,command)
+                su.sendAll(client, data)
+
+            if 'getfile' in command:
+                su.sendAll(client,command)
+                data = su.recvAll(client)
+                if data in '':
+                    print 'remote file failed'
+                    continue
+                fu.createFileWithData(splited_cmd[2],data)
+         
 
     def excuteRemoteCommand(self,client, address, command):
+        splited_cmd = command.split(' ')
+        if len(splited_cmd) < 2:
+            return
+        
+        su.sendAll(client, command)
+        if splited_cmd[1] in 'cd':
+             su.sendAll(client, command)
+             return
+
         su.sendAll(client, command)
         print su.recvAll(client)
     
