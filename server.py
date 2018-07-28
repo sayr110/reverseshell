@@ -30,6 +30,9 @@ class Server(object):
             self.consoleWithClient(client, address)
         except KeyboardInterrupt:
             raise
+        except SystemExit:
+            self.sock.close()
+            raise
         except:
             self.listen()
     
@@ -77,11 +80,10 @@ class Server(object):
         if len(splited_cmd) < 2:
             return
         
-        net.sendAll(client, command)
         if splited_cmd[1] in 'cd':
             net.sendAll(client, command)
             return
-
+        print 'xxxx'
         net.sendAll(client, command)
         print net.recvAll(client)
     

